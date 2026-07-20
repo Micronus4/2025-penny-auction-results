@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack's Bowers Auction Results</title>
+    <style>
+        /* ==========================================================================
+           1. CORE THEME CONFIGURATION (VARIABLES & RESET)
+           ========================================================================== */
+        :root {
+            /* Color System */
+            --bg-main: #0a0f1d;
+            --bg-card: #121829;
+            --bg-row-even: #161f38;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #0072ff;
+            --border-color: #24335c;
+            
+            /* Typography Contrast Colors */
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-bright: #38bdf8;
+            
+            /* Badge Status Elements */
+            --pill-bg: rgba(56, 189, 248, 0.08);
+            --pill-gold-bg: rgba(234, 179, 8, 0.12);
+            --pill-gold-text: #fde047;
+            --pill-red-bg: rgba(239, 68, 68, 0.12);
+            --pill-red-text: #fca5a5;
+            --error-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* ==========================================================================
+           2. BRANDING & HEADER COMPONENT
+           ========================================================================== */
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .timestamp {
+            font-family: monospace;
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            background: rgba(0, 242, 254, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+        }
+
+        /* ==========================================================================
+           3. KPI DASHBOARD METRICS SYSTEM
+           ========================================================================== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-blue));
+        }
+
+        .card-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            font-family: monospace;
+        }
+
+        /* ==========================================================================
+           4. TOOLBAR & INPUT SYSTEMS
+           ========================================================================== */
+        .table-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .search-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            color: var(--text-bright);
+            width: 300px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+
+        /* ==========================================================================
+           5. DATA TABLE VIEW COMPONENT
+           ========================================================================== */
+        .table-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        table.hidden {
+            display: none;
+        }
+
+        th, td {
+            width: 33.33%;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: rgba(22, 31, 56, 0.9);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        th:not(:last-child), td:not(:last-child) {
+            border-right: 1px solid rgba(36, 51, 92, 0.35);
+        }
+
+        td {
+            border-bottom: 1px solid rgba(36, 51, 92, 0.4);
+            font-size: 0.95rem;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--bg-row-even);
+        }
+
+        .set-id, .price-val {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            transition: font-size 0.2s ease;
+        }
+
+        .set-id {
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        .price-val {
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text-bright);
+        }
+
+        /* Single Match Dynamic Focus Rules */
+        tr.single-match .set-id {
+            font-size: 1.5rem;
+        }
+        tr.single-match .price-val {
+            font-size: 1.65rem;
+        }
+        tr.single-match .pill {
+            font-size: 0.95rem;
+        }
+
+        /* ==========================================================================
+           6. BADGES, TOKENS, AND ALERTS
+           ========================================================================== */
+        .includes-container {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pill {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            background-color: var(--pill-bg);
+            color: #bae6fd;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .pill.gold {
+            background-color: var(--pill-gold-bg);
+            color: var(--pill-gold-text);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .pill.red {
+            background-color: var(--pill-red-bg);
+            color: var(--pill-red-text);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .error-message {
+            display: none;
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--error-red);
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        /* ==========================================================================
+           7. SYSTEM SCROLLBAR MODIFICATIONS
+           ========================================================================== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-blue);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Stack's Bowers Auction Results</h1>
+        <div class="timestamp">AUCTION DATE: December 12, 2025</div>
+    </header>
+
+    <div class="dashboard-grid">
+        <div class="card">
+            <div class="card-label">Auction Total</div>
+            <div class="card-value" id="stat-total">$16,764,500</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Average Bid</div>
+            <div class="card-value" id="stat-avg">$72,261</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Highest Bid</div>
+            <div class="card-value" id="stat-max">$800,000</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Lowest Bid</div>
+            <div class="card-value" id="stat-min">$48,000</div>
+        </div>
+        <div class="card">
+            <div class="card-label">Total Batches</div>
+            <div class="card-value" id="stat-count">232</div>
+        </div>
+    </div>
+
+    <div class="table-toolbar">
+        <input type="text" id="search-input" class="search-box" placeholder="Search Entries (e.g., 45)...">
+    </div>
+
+    <div class="table-container">
+        <div id="error-display" class="error-message">Invalid Request</div>
+        <table id="data-table">
+            <thead>
+                <tr>
+                    <th>Set ID</th>
+                    <th>Final Bid</th>
+                    <th>Set Includes</th>
+                </tr>
+            </thead>
+            <tbody id="data-rows">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    /* ==========================================================================
+       8. DATA LOGIC & APPLICATION STATE CONTROLLER MODULE
+       ========================================================================== */
+    
+    // Core Array Registry Data Store
+    const rawData = [
+        200000, 110000, 110000, 85000, 70000, 55000, 50000, 60000, 75000, 65000,
+        60000, 60000, 55000, 55000, 52500, 52500, 70000, 52500, 85000, 50000,
+        52500, 50000, 49000, 48000, 48000, 65000, 57500, 52500, 52500, 52500,
+        50000, 48000, 52500, 50000, 48000, 48000, 60000, 48000, 48000, 60000,
+        60000, 48000, 48000, 50000, 60000, 57500, 48000, 87500, 49000, 49000,
+        62500, 50000, 60000, 62500, 55000, 57500, 50000, 65000, 49000, 65000,
+        50000, 67500, 48000, 48000, 55000, 70000, 70000, 60000, 160000, 67500,
+        70000, 72500, 60000, 70000, 50000, 60000, 85000, 70000, 67500, 60000,
+        52500, 52500, 60000, 57500, 50000, 55000, 70000, 75000, 72500, 50000,
+        70000, 65000, 70000, 52500, 72500, 62500, 62500, 55000, 80000, 75000,
+        52500, 70000, 62500, 70000, 70000, 57500, 62500, 62500, 55000, 70000,
+        65000, 60000, 67500, 55000, 65000, 70000, 70000, 52500, 57500, 62500,
+        65000, 70000, 72500, 65000, 62500, 70000, 62500, 70000, 72500, 72500,
+        65000, 75000, 72500, 72500, 72500, 62500, 62500, 72500, 62500, 62500,
+        70000, 65000, 62500, 60000, 82500, 65000, 65000, 65000, 65000, 72500,
+        65000, 65000, 62500, 60000, 105000, 120000, 130000, 65000, 72500, 70000,
+        65000, 60000, 65000, 110000, 67500, 60000, 65000, 110000, 60000, 65000,
+        60000, 67500, 72500, 67500, 72500, 65000, 72500, 67500, 67500, 67500,
+        110000, 77500, 77500, 65000, 75000, 72500, 75000, 75000, 70000, 115000,
+        75000, 65000, 67500, 95000, 65000, 67500, 70000, 67500, 70000, 67500,
+        70000, 77500, 70000, 77500, 72500, 80000, 77500, 77500, 77500, 70000,
+        70000, 180000, 115000, 120000, 77500, 77500, 80000, 77500, 72500, 120000,
+        70000, 87500, 72500, 75000, 75000, 75000, 80000, 75000, 72500, 87500,
+        150000, 800000
+    ];
+
+    // DOM Element Selections Cache
+    const tbody = document.getElementById('data-rows');
+    const searchInput = document.getElementById('search-input');
+    const dataTable = document.getElementById('data-table');
+    const errorDisplay = document.getElementById('error-display');
+
+    /**
+     * Renders and prints current filtered arrays inside DOM view structures.
+     * Includes exception bound checks to manage system error modules.
+     */
+    function displayTable(filterText = '') {
+        const targetNumStr = filterText.replace('#', '').trim();
+        
+        // 1. Boundary Verification Rule Guard
+        if (targetNumStr !== '') {
+            const parsedNum = Number(targetNumStr);
+            if (!isNaN(parsedNum) && (parsedNum > 232 || parsedNum < 1)) {
+                dataTable.classList.add('hidden');
+                errorDisplay.classList.add('visible');
+                return;
+            }
+        }
+
+        // 2. Normal View System State Reset
+        dataTable.classList.remove('hidden');
+        errorDisplay.classList.remove('visible');
+        tbody.innerHTML = '';
+
+        // 3. Collect Filtered Array Entities
+        const filteredEntries = [];
+        rawData.forEach((value, index) => {
+            const setNum = index + 1;
+            if (targetNumStr === '' || setNum.toString() === targetNumStr) {
+                filteredEntries.push({ value, setNum });
+            }
+        });
+
+        const isSingleMatch = (targetNumStr !== '' && filteredEntries.length === 1);
+
+        // 4. Generate Output Nodes Loop
+        filteredEntries.forEach(({ value, setNum }) => {
+            const formattedPrice = '$' + value.toLocaleString();
+            const setString = `#${setNum}`;
+            const tr = document.createElement('tr');
+            
+            if (isSingleMatch) {
+                tr.classList.add('single-match');
+            }
+
+            // Build item dynamic token stack
+            let pillsHtml = `
+                <span class="pill">2025-P Ω</span>
+                <span class="pill">2025-D Ω</span>
+                <span class="pill gold">24k Gold 2025-P Ω</span>
+            `;
+
+            if (setNum === 232) {
+                pillsHtml += `<span class="pill red">Cancelled Ω dies</span>`;
+            }
+
+            tr.innerHTML = `
+                <td><div class="set-id">${setString}</div></td>
+                <td><div class="price-val">${formattedPrice}</div></td>
+                <td><div class="includes-container">${pillsHtml}</div></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Interactive Core Input Listeners
+    searchInput.addEventListener('input', (e) => {
+        displayTable(e.target.value);
+    });
+
+    // Bootstrapped Initial View Setup Initialization
+    displayTable();
+</script>
+</body>
+</html>
